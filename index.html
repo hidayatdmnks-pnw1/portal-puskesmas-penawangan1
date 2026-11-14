@@ -91,6 +91,31 @@
     font-size: 11px;
     color: var(--muted);
     margin-top: 3px;
+
+  /* BACKGROUND FOTO PUSKESMAS */
+body {
+    background-color: #f4f8f5;
+
+    background-image:
+        linear-gradient(
+            rgba(244, 248, 245, 0.78),
+            rgba(244, 248, 245, 0.78)
+        ),
+        url("background-puskesmas.jpg");
+
+    background-position: center center;
+    background-size: cover;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+/* Tampilan HP */
+@media (max-width: 760px) {
+    body {
+        background-attachment: scroll;
+    }
+}
+  
 }  </style>
 </head>
 <body>
