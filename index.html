@@ -22,7 +22,76 @@
     .note{margin-top:22px;background:#edf5ef;border:1px solid #d9e9dd;border-radius:13px;padding:14px 16px;font-size:12px;color:#426153;line-height:1.6}
     @media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding:22px 18px 40px}main{padding-left:16px;padding-right:16px}}
     @media(max-width:480px){.grid{grid-template-columns:1fr}.card{min-height:unset}.brand small{font-size:11px}.section-head span{display:none}}
-  </style>
+.submenu-card {
+    display: block;
+    padding: 0;
+    overflow: hidden;
+}
+
+.submenu {
+    width: 100%;
+}
+
+.submenu summary {
+    list-style: none;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 17px;
+    cursor: pointer;
+}
+
+.submenu summary::-webkit-details-marker {
+    display: none;
+}
+
+.submenu summary > div:nth-child(2) {
+    flex: 1;
+}
+
+.submenu .chevron {
+    color: var(--muted);
+    transition: transform .2s;
+}
+
+.submenu[open] .chevron {
+    transform: rotate(180deg);
+}
+
+.submenu-links {
+    border-top: 1px solid var(--line);
+    padding: 10px 14px 14px;
+    display: grid;
+    gap: 8px;
+}
+
+.submenu-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px;
+    background: var(--bg);
+    border-radius: 10px;
+}
+
+.submenu-link:hover {
+    background: #e9f5ee;
+}
+
+.submenu-link .link-text {
+    flex: 1;
+}
+
+.submenu-link strong {
+    font-size: 13px;
+}
+
+.submenu-link small {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+}  </style>
 </head>
 <body>
   <header class="hero">
@@ -64,7 +133,27 @@ const menuData = [
     items: [
       { title: "Arsip Dokumen", desc: "Folder arsip dan dokumen umum puskesmas", type: "folder", icon: "📁", url: "#" },
       { title: "Surat Masuk dan Keluar", desc: "Pencatatan serta arsip surat", type: "Spreadsheet", icon: "📨", url: "#" },
-      { title: "SK dan SOP", desc: "Kumpulan surat keputusan dan prosedur", type: "Google Drive", icon: "📚", url: "#" }
+      { title: "SK dan SOP",
+              desc: "Pilih kategori dokumen yang ingin dibuka",
+              type: "Submenu",
+              icon: "📚",
+              children: [
+            {
+                title: "SK",
+                desc: "Kumpulan Surat Keputusan Puskesmas",
+                type: "Google Drive",
+                icon: "📄",
+                url: "LINK_FOLDER_SK"
+            },
+            {
+                title: "SOP",
+                desc: "Kumpulan Standar Operasional Prosedur",
+                type: "Google Drive",
+                icon: "📋",
+                url: "LINK_FOLDER_SOP"
+        }
+    ]
+}
     ]
   },
   {
@@ -91,44 +180,193 @@ const search = document.getElementById("search");
 const empty = document.getElementById("empty");
 
 function render(query = "") {
-  const q = query.trim().toLocaleLowerCase("id");
-  sections.innerHTML = "";
-  let count = 0;
-  menuData.forEach(group => {
-    const items = group.items.filter(item =>
-      [item.title, item.desc, item.type, group.category].join(" ").toLocaleLowerCase("id").includes(q)
-    );
-    if (!items.length) return;
-    count += items.length;
-    const section = document.createElement("section");
-    section.innerHTML = `<div class="section-head"><h2>${group.category}</h2><span>${items.length} menu</span></div>`;
-    const grid = document.createElement("div");
-    grid.className = "grid";
-    items.forEach(item => {
-      const card = document.createElement("a");
-      card.className = "card";
-      card.href = item.url;
-      card.target = "_blank";
-      card.rel = "noopener noreferrer";
-      card.innerHTML = `<div class="ico" aria-hidden="true">${item.icon}</div><div><h3></h3><p></p><span class="open">${item.type} ↗</span></div>`;
-      card.querySelector("h3").textContent = item.title;
-      card.querySelector("p").textContent = item.desc;
-      if (item.url === "#") {
-        card.addEventListener("click", e => {
-          e.preventDefault();
-          alert("Link untuk menu ini belum diisi. Silakan tambahkan URL pada bagian DATA MENU di file index.html.");
+    const q = query.trim().toLocaleLowerCase("id");
+
+    sections.innerHTML = "";
+    let count = 0;
+
+    menuData.forEach(group => {
+
+        const items = group.items.map(item => {
+
+            const parentText = [
+                item.title,
+                item.desc,
+                item.type,
+                group.category
+            ].join(" ").toLocaleLowerCase("id");
+
+            if (item.children) {
+
+                const matchingChildren = item.children.filter(child =>
+                    [
+                        child.title,
+                        child.desc,
+                        child.type,
+                        item.title,
+                        group.category
+                    ].join(" ").toLocaleLowerCase("id").includes(q)
+                );
+
+                if (!q || parentText.includes(q)) {
+                    return {
+                        ...item,
+                        visibleChildren: item.children,
+                        forceOpen: false
+                    };
+                }
+
+                if (matchingChildren.length) {
+                    return {
+                        ...item,
+                        visibleChildren: matchingChildren,
+                        forceOpen: true
+                    };
+                }
+
+                return null;
+            }
+
+            return parentText.includes(q) ? item : null;
+
+        }).filter(Boolean);
+
+        if (!items.length) return;
+
+        count += items.length;
+
+        const section = document.createElement("section");
+
+        section.innerHTML = `
+            <div class="section-head">
+                <h2>${group.category}</h2>
+                <span>${items.length} menu</span>
+            </div>
+        `;
+
+        const grid = document.createElement("div");
+        grid.className = "grid";
+
+        items.forEach(item => {
+
+            // MENU YANG MEMILIKI SUBMENU
+            if (item.children) {
+
+                const card = document.createElement("div");
+                card.className = "card submenu-card";
+
+                const details = document.createElement("details");
+                details.className = "submenu";
+                details.open = item.forceOpen;
+
+                const summary = document.createElement("summary");
+
+                const ico = document.createElement("div");
+                ico.className = "ico";
+                ico.textContent = item.icon;
+
+                const info = document.createElement("div");
+
+                const title = document.createElement("h3");
+                title.textContent = item.title;
+
+                const desc = document.createElement("p");
+                desc.textContent = item.desc;
+
+                const open = document.createElement("span");
+                open.className = "open";
+                open.textContent = "Buka submenu";
+
+                info.append(title, desc, open);
+
+                const arrow = document.createElement("span");
+                arrow.className = "chevron";
+                arrow.textContent = "⌄";
+
+                summary.append(ico, info, arrow);
+
+                const links = document.createElement("div");
+                links.className = "submenu-links";
+
+                item.visibleChildren.forEach(child => {
+
+                    const a = document.createElement("a");
+                    a.className = "submenu-link";
+                    a.href = child.url || "#";
+                    a.target = "_blank";
+                    a.rel = "noopener noreferrer";
+
+                    const childIcon = document.createElement("span");
+                    childIcon.textContent = child.icon;
+
+                    const text = document.createElement("span");
+                    text.className = "link-text";
+
+                    const strong = document.createElement("strong");
+                    strong.textContent = child.title;
+
+                    const small = document.createElement("small");
+                    small.textContent = child.desc;
+
+                    text.append(strong, small);
+
+                    const external = document.createElement("span");
+                    external.textContent = "↗";
+
+                    a.append(childIcon, text, external);
+
+                    if (!child.url || child.url === "#") {
+                        a.addEventListener("click", e => {
+                            e.preventDefault();
+                            alert("Link submenu belum diisi.");
+                        });
+                    }
+
+                    links.appendChild(a);
+                });
+
+                details.append(summary, links);
+                card.appendChild(details);
+                grid.appendChild(card);
+
+                return;
+            }
+
+            // MENU BIASA
+            const card = document.createElement("a");
+
+            card.className = "card";
+            card.href = item.url;
+            card.target = "_blank";
+            card.rel = "noopener noreferrer";
+
+            card.innerHTML = `
+                <div class="ico">${item.icon}</div>
+                <div>
+                    <h3></h3>
+                    <p></p>
+                    <span class="open">${item.type} ↗</span>
+                </div>
+            `;
+
+            card.querySelector("h3").textContent = item.title;
+            card.querySelector("p").textContent = item.desc;
+
+            if (!item.url || item.url === "#") {
+                card.addEventListener("click", e => {
+                    e.preventDefault();
+                    alert("Link untuk menu ini belum diisi.");
+                });
+            }
+
+            grid.appendChild(card);
+
         });
-      }
-      grid.appendChild(card);
+
+        section.appendChild(grid);
+        sections.appendChild(section);
+
     });
-    section.appendChild(grid);
-    sections.appendChild(section);
-  });
-  empty.style.display = count ? "none" : "block";
+
+    empty.style.display = count ? "none" : "block";
 }
-search.addEventListener("input", e => render(e.target.value));
-document.getElementById("year").textContent = new Date().getFullYear();
-render();
-</script>
-</body>
-</html>
