@@ -143,14 +143,14 @@ const menuData = [
                 desc: "Kumpulan Surat Keputusan Puskesmas",
                 type: "Google Drive",
                 icon: "📄",
-                url: "LINK_FOLDER_SK"
+                url: "#" // Ganti dengan tautan folder Google Drive SK
             },
             {
                 title: "SOP",
                 desc: "Kumpulan Standar Operasional Prosedur",
                 type: "Google Drive",
                 icon: "📋",
-                url: "LINK_FOLDER_SOP"
+                url: "#" // Ganti dengan tautan folder Google Drive SOP
         }
     ]
 }
@@ -370,3 +370,17 @@ function render(query = "") {
 
     empty.style.display = count ? "none" : "block";
 }
+
+// Hubungkan kolom pencarian dengan fungsi render.
+search.addEventListener("input", () => {
+    render(search.value);
+});
+
+// Tampilkan tahun berjalan pada footer.
+document.getElementById("year").textContent = new Date().getFullYear();
+
+// Render semua menu saat halaman pertama kali dibuka.
+render();
+</script>
+</body>
+</html>
