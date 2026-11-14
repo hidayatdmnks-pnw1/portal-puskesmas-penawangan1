@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#176b50">
+  <title>Portal Administrasi Puskesmas Penawangan I</title>
+  <style>
+    :root{--green:#176b50;--green2:#21845f;--ink:#18332a;--muted:#687a72;--line:#e3ebe6;--bg:#f4f8f5;--white:#fff}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+    a{color:inherit;text-decoration:none}.hero{background:linear-gradient(120deg,#14583f,#21845f);color:#fff;padding:28px 22px 42px}
+    .wrap{max-width:1120px;margin:auto}.brand{display:flex;align-items:center;gap:13px}.logo{width:48px;height:48px;border-radius:14px;background:#fff;color:var(--green);display:grid;place-items:center;font-size:25px;font-weight:800}
+    .brand small{display:block;color:#d6eee2;font-size:12px;margin-top:3px}.hero h1{font-size:clamp(25px,4vw,38px);margin:34px 0 8px;letter-spacing:-.8px}.hero p{margin:0;color:#e2f2e9;max-width:650px;line-height:1.6}
+    main{max-width:1120px;margin:-22px auto 0;padding:0 22px 38px}.toolbar{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px 15px;box-shadow:0 8px 24px #123b2410}
+    .toolbar input{border:0;outline:0;flex:1;min-width:0;font:inherit;font-size:14px}.search-icon{font-size:19px;color:var(--muted)}
+    .section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:28px 0 14px}.section-head h2{font-size:18px;margin:0}.section-head span{font-size:12px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:17px;min-height:135px;transition:.18s;display:flex;gap:14px;align-items:flex-start}
+    .card:hover{transform:translateY(-2px);box-shadow:0 9px 24px #123b2410;border-color:#b9d8c8}.ico{width:43px;height:43px;border-radius:12px;display:grid;place-items:center;font-size:21px;flex:none;background:#e9f5ee}
+    .card h3{font-size:15px;margin:2px 0 6px}.card p{font-size:12px;line-height:1.5;color:var(--muted);margin:0 0 10px}.open{font-size:12px;color:var(--green);font-weight:700}
+    .empty{display:none;background:#fff;border:1px dashed var(--line);padding:25px;text-align:center;color:var(--muted);border-radius:14px}
+    footer{text-align:center;color:var(--muted);font-size:12px;padding:10px 20px 28px}
+    .note{margin-top:22px;background:#edf5ef;border:1px solid #d9e9dd;border-radius:13px;padding:14px 16px;font-size:12px;color:#426153;line-height:1.6}
+    @media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding:22px 18px 40px}main{padding-left:16px;padding-right:16px}}
+    @media(max-width:480px){.grid{grid-template-columns:1fr}.card{min-height:unset}.brand small{font-size:11px}.section-head span{display:none}}
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <div class="brand">
+        <div class="logo">P</div>
+        <div><strong>PUSKESMAS PENAWANGAN I</strong><small>Kabupaten Grobogan · Jawa Tengah</small></div>
+      </div>
+      <h1>Portal Administrasi</h1>
+      <p>Satu pintu untuk mengakses dokumen, formulir, spreadsheet, dan berbagai kebutuhan administrasi Puskesmas Penawangan I.</p>
+    </div>
+  </header>
+  <main>
+    <div class="toolbar">
+      <span class="search-icon">⌕</span>
+      <input id="search" type="search" placeholder="Cari menu, dokumen, atau aplikasi..." aria-label="Cari menu">
+    </div>
+    <div id="sections"></div>
+    <div id="empty" class="empty">Menu tidak ditemukan. Coba kata kunci lain.</div>
+    <div class="note"><strong>Catatan:</strong> Portal ini merupakan halaman pintasan. Hak akses dokumen tetap mengikuti pengaturan berbagi pada Google Drive, Google Form, atau Google Spreadsheet masing-masing.</div>
+  </main>
+  <footer>© <span id="year"></span> Puskesmas Penawangan I · Portal Administrasi</footer>
+
+<script>
+/*
+  CARA MENAMBAH / MENGUBAH LINK:
+  1. Buka file index.html menggunakan Notepad atau editor teks.
+  2. Cari bagian "DATA MENU" di bawah ini.
+  3. Ubah url: "#" menjadi link Google Drive/Form/Spreadsheet yang sebenarnya.
+  4. Ubah judul, keterangan, ikon, atau kategori bila diperlukan.
+  5. Simpan file, lalu unggah perubahan ke GitHub.
+
+  Gunakan URL berbagi Google yang sesuai. Pastikan izin file/folder Google
+  sudah diatur agar pegawai yang dituju dapat membukanya.
+*/
+const menuData = [
+  {
+    category: "Administrasi Umum",
+    items: [
+      { title: "Arsip Dokumen", desc: "Folder arsip dan dokumen umum puskesmas", type: "Google Drive", icon: "📁", url: "#" },
+      { title: "Surat Masuk dan Keluar", desc: "Pencatatan serta arsip surat", type: "Spreadsheet", icon: "📨", url: "#" },
+      { title: "SK dan SOP", desc: "Kumpulan surat keputusan dan prosedur", type: "Google Drive", icon: "📚", url: "#" }
+    ]
+  },
+  {
+    category: "Kepegawaian",
+    items: [
+      { title: "Data Pegawai", desc: "Data dan administrasi pegawai", type: "Spreadsheet", icon: "👥", url: "#" },
+      { title: "Absensi Pegawai", desc: "Formulir atau rekap kehadiran", type: "Google Form", icon: "🗓️", url: "#" },
+      { title: "Cuti dan Izin", desc: "Pengajuan cuti, izin, dan keterangan", type: "Google Form", icon: "📝", url: "#" }
+    ]
+  },
+  {
+    category: "Pelayanan dan Program",
+    items: [
+      { title: "Logbook Pelayanan", desc: "Pencatatan kegiatan dan pelayanan", type: "Spreadsheet", icon: "📋", url: "#" },
+      { title: "Laporan Kegiatan", desc: "Pengumpulan laporan kegiatan program", type: "Google Form", icon: "📊", url: "#" },
+      { title: "Dokumen Program", desc: "Arsip dokumen UKM, UKP, dan program", type: "Google Drive", icon: "🗂️", url: "#" }
+    ]
+  },
+  {
+    category: "Formulir dan Rekap Data",
+    items: [
+      { title: "Formulir Pelaporan", desc: "Kumpulan formulir online", type: "Google Form", icon: "📄", url: "#" },
+      { title: "Rekapitulasi Data", desc: "Spreadsheet monitoring dan rekapitulasi", type: "Spreadsheet", icon: "📈", url: "#" },
+      { title: "Folder Bersama", desc: "Penyimpanan file bersama pegawai", type: "Google Drive", icon: "☁️", url: "#" }
+    ]
+  }
+];
+
+const sections = document.getElementById("sections");
+const search = document.getElementById("search");
+const empty = document.getElementById("empty");
+
+function render(query = "") {
+  const q = query.trim().toLocaleLowerCase("id");
+  sections.innerHTML = "";
+  let count = 0;
+  menuData.forEach(group => {
+    const items = group.items.filter(item =>
+      [item.title, item.desc, item.type, group.category].join(" ").toLocaleLowerCase("id").includes(q)
+    );
+    if (!items.length) return;
+    count += items.length;
+    const section = document.createElement("section");
+    section.innerHTML = `<div class="section-head"><h2>${group.category}</h2><span>${items.length} menu</span></div>`;
+    const grid = document.createElement("div");
+    grid.className = "grid";
+    items.forEach(item => {
+      const card = document.createElement("a");
+      card.className = "card";
+      card.href = item.url;
+      card.target = "_blank";
+      card.rel = "noopener noreferrer";
+      card.innerHTML = `<div class="ico" aria-hidden="true">${item.icon}</div><div><h3></h3><p></p><span class="open">${item.type} ↗</span></div>`;
+      card.querySelector("h3").textContent = item.title;
+      card.querySelector("p").textContent = item.desc;
+      if (item.url === "#") {
+        card.addEventListener("click", e => {
+          e.preventDefault();
+          alert("Link untuk menu ini belum diisi. Silakan tambahkan URL pada bagian DATA MENU di file index.html.");
+        });
+      }
+      grid.appendChild(card);
+    });
+    section.appendChild(grid);
+    sections.appendChild(section);
+  });
+  empty.style.display = count ? "none" : "block";
+}
+search.addEventListener("input", e => render(e.target.value));
+document.getElementById("year").textContent = new Date().getFullYear();
+render();
+</script>
+</body>
+</html>
